@@ -1,0 +1,91 @@
+// Function to handle appointment form submission
+document.getElementById("appointment-form").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const age = document.getElementById("age").value;
+  const phone = document.getElementById("phone").value;
+  const email = document.getElementById("email").value;
+  const appointmentDate = document.getElementById("appointment-date").value;
+  const appointmentTime = document.getElementById("appointment-time").value;
+  const physicianId = document.getElementById('physician-select').value;
+
+  if (validateInputFields(name, age, phone, email, appointmentDate, appointmentTime) && physicianId) {
+    const selectedDoc = physicians.find(doc => doc.id == physicianId);
+    const receiptContent = `
+      Name: ${name}\n
+      Age: ${age}\n
+      Phone: ${phone}\n
+      Email: ${email}\n
+      Appointment with: ${selectedDoc.name}\n
+      Specialty: ${selectedDoc.specialty}\n
+      Date: ${appointmentDate}\n
+      Time: ${appointmentTime}
+    `;
+
+    // Create a Blob with the receipt content
+    const blob = new Blob([receiptContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    // Create a download link and simulate a click
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = 'appointment_receipt.txt';
+    downloadLink.style.display = 'none'; // Hide the link
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    
+    // Hide the appointment form and show the receipt
+    document.getElementById("appt").style.display = "none";
+    document.getElementById("appointment-form").style.display = "none";
+    document.getElementById('appointment-receipt').innerHTML = `<div>
+      <p class="mt-3 capitalize">Name: ${name}</p>
+      <p class="mt-3">Age: ${age}</p>
+      <p class="mt-3">Phone: ${phone}</p>
+      <p class="mt-3">Email: ${email}</p>
+      <p class="mt-3">Appointment with: ${selectedDoc.name}</p>
+      <p class="mt-3">Specialty: ${selectedDoc.specialty}</p>
+      <p class="mt-3">Date: ${appointmentDate}</p>
+      <p class="mt-3">Time: ${appointmentTime}</p>
+      <p class="mt-3 text-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer" onclick="downloadReceipt()">Download</p>
+    </div>`;
+    document.getElementById("confirmed").classList.remove("hidden");
+    document.getElementById('appointment-receipt').classList.remove("hidden");
+  } else {
+    alert("Please select a physician, date, and time.");
+  }
+});
+
+// Function to download the receipt
+function downloadReceipt() {
+  const name = document.getElementById("name").value;
+  const age = document.getElementById("age").value;
+  const phone = document.getElementById("phone").value;
+  const email = document.getElementById("email").value;
+  const appointmentDate = document.getElementById("appointment-date").value;
+  const appointmentTime = document.getElementById("appointment-time").value;
+  const physicianId = document.getElementById('physician-select').value;
+  
+  const selectedDoc = physicians.find(doc => doc.id == physicianId);
+  const receiptContent = `
+    Name: ${name}\n
+    Age: ${age}\n
+    Phone: ${phone}\n
+    Email: ${email}\n
+    Appointment with: ${selectedDoc.name}\n
+    Specialty: ${selectedDoc.specialty}\n
+    Date: ${appointmentDate}\n
+    Time: ${appointmentTime}
+  `;
+  
+  const blob = new Blob([receiptContent], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  
+  const downloadLink = document.createElement('a');
+  downloadLink.href = url;
+  downloadLink.download = 'appointment_receipt.txt';
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+}
