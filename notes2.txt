@@ -109,28 +109,6 @@ function validateAge(age) {
   return re.test(age) && parseInt(age, 10) >= 5;
 }
 
-// Retrieve booked appointments from localStorage
-function getBookedAppointments() {
-  const appointments = localStorage.getItem('bookedAppointments');
-  return appointments ? JSON.parse(appointments) : [];
-}
-
-// Save booked appointments to localStorage
-function saveBookedAppointments(appointments) {
-  localStorage.setItem('bookedAppointments', JSON.stringify(appointments));
-}
-
-// Check if a physician is already booked for a specific date and time
-function isPhysicianBooked(physicianId, date, time) {
-  const bookedAppointments = getBookedAppointments();
-  console.log('Checking if physician is booked:', { physicianId, date, time });
-  return bookedAppointments.some(appointment =>
-    appointment.physicianId === physicianId &&
-    appointment.date === date &&
-    appointment.time === time
-  );
-}
-
 // Handle appointment form submission
 document.getElementById("appointment-form").addEventListener("submit", function(event) {
   event.preventDefault();
@@ -144,55 +122,45 @@ document.getElementById("appointment-form").addEventListener("submit", function(
   const physicianId = document.getElementById('physician-select').value;
 
   if (validateInputFields(name, age, phone, email, appointmentDate, appointmentTime) && physicianId) {
-    if (isPhysicianBooked(physicianId, appointmentDate, appointmentTime)) {
-      alert('This physician is already booked for the selected time. Please choose another date or time.');
-      
-      // Clear the selected time slot and date to force the user to select another time/date
-      document.getElementById("appointment-time").value = '';
-      document.getElementById("appointment-date").value = '';
-    } else {
-      // Retrieve current appointments and add the new one
-      const bookedAppointments = getBookedAppointments();
-      bookedAppointments.push({
-        physicianId,
-        date: appointmentDate,
-        time: appointmentTime,
-        name,
-        age,
-        phone,
-        email
-      });
-      
-      // Save updated appointments to localStorage
-      saveBookedAppointments(bookedAppointments);
-
-      const selectedDoc = physicians.find(doc => doc.id == physicianId);
-      const receipt = `
-          <div>
-            
-            <p class="mt-3 capitalize">Name: ${name}</p>
-            <p class="mt-3">Age: ${age}</p>
-            <p class="mt-3">Phone: ${phone}</p>
-            <p class="mt-3">Email: ${email}</p>
-            <p class="mt-3">Appointment with: ${selectedDoc.name}</p>
-            <p class="mt-3">Specialty: ${selectedDoc.specialty}</p>
-            <p class="mt-3">Date: ${appointmentDate}</p>
-            <p class="mt-3">Time: ${appointmentTime}</p>
-            <a href="" class="mt-3 text-center text-white flex justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Download</a>
-            
-          </div>
-      `;
-
-      document.getElementById("appt").style.display = "none";
-      document.getElementById("appointment-form").style.display = "none";
-      document.getElementById('appointment-receipt').innerHTML = receipt;
-      document.getElementById("confirmed").classList.remove("hidden");
-      document.getElementById('appointment-receipt').classList.remove("hidden");
-    }
+    const selectedDoc = physicians.find(doc => doc.id == physicianId);
+    const receipt = `
+        <div>
+          
+          <p class="mt-3 capitalize">Name: ${name}</p>
+          <p class="mt-3">Age: ${age}</p>
+          <p class="mt-3">Phone: ${phone}</p>
+          <p class="mt-3">Email: ${email}</p>
+          <p class="mt-3">Appointment with: ${selectedDoc.name}</p>
+          <p class="mt-3">Specialty: ${selectedDoc.specialty}</p>
+          <p class="mt-3">Date: ${appointmentDate}</p>
+          <p class="mt-3">Time: ${appointmentTime}</p>
+          <a href="" class="mt-3 text-center text-white flex justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Download</a>
+          
+        </div>
+    `;
+    document.getElementById("appt").style.display = "none";
+    document.getElementById("appointment-form").style.display = "none";
+    document.getElementById('appointment-receipt').innerHTML = receipt;
+    document.getElementById("confirmed").classList.remove("hidden");
+    document.getElementById('appointment-receipt').classList.remove("hidden");
   } else {
     alert("Please select a physician, date, and time.");
   }
 });
+
+// // Get a diagnosis and administer drugs based on symptoms
+// function getDiagnosis() {
+//   const symptoms = document.getElementById('symptoms').value.toLowerCase();
+//   const diagnosis = diagnoses[symptoms] || "Please visit a physician for further examination.";
+//   document.getElementById('diagnosis-result').innerText = `Diagnosis: ${diagnosis}`;
+//   administerDrugs(diagnosis);
+// }
+
+// // Administer drugs based on the diagnosis
+// function administerDrugs(diagnosis) {
+//   const drug = drugPrescription[diagnosis] || "No specific medication found. Please visit a physician.";
+//   document.getElementById('prescription-result').innerText = `Prescribed Drug: ${drug}`;
+// }
 
 // Initialize form options on page load
 window.onload = function() {
